@@ -15,11 +15,14 @@ def solution___at_least_one_leftie():
             loc = '\t\t' * i
             print(f'{loc}[P{i} L:{str(leftie)[:1]}]{msg}')
 
-        def get_left(i): return i
-        def get_right(i): return (i + 1) % PHILOSOPHERS
-
         def think():
             log('think')
+
+        def eat():
+            log('eat')
+
+        def get_left(i): return i
+        def get_right(i): return (i + 1) % PHILOSOPHERS
 
         def get_forks(i):
             if leftie:
@@ -28,9 +31,6 @@ def solution___at_least_one_leftie():
             else:
                 forks[get_right(i)].acquire()
                 forks[get_left(i)].acquire()
-
-        def eat():
-            log('eat')
 
         def put_forks(i):
             forks[get_right(i)].release()
@@ -72,6 +72,15 @@ def solution__tanenbaum():
             loc = '\t\t' * i
             print(f'{loc}[P{i}]{msg}')
 
+        def think():
+            log('think')
+
+        def eat():
+            log('eat')
+
+        def left(i): return (i + (PHILOSOPHERS - 1)) % PHILOSOPHERS
+        def right(i): return (i + 1) % PHILOSOPHERS
+
         def get_fork(i):
             mutex.acquire()
             state[i] = 'hungry'
@@ -86,19 +95,10 @@ def solution__tanenbaum():
             test(left(i))
             mutex.release()
 
-        def left(i): return (i + (PHILOSOPHERS - 1)) % PHILOSOPHERS
-        def right(i): return (i + 1) % PHILOSOPHERS
-
         def test(i):
             if state[i] == 'hungry' and state[left(i)] != 'eating' and state[right(i)] != 'eating':
                 state[i] = 'eating'
                 sem[i].release()
-
-        def think():
-            log('think')
-
-        def eat():
-            log('eat')
 
         while True:
             think()
@@ -106,11 +106,11 @@ def solution__tanenbaum():
             eat()
             put_fork(i)
 
-    for i in range(PHILOSOPHERS):
-        Thread(daemon=True, target=philosopher, args=(i,)).start()
+    [Thread(daemon=True, target=philosopher, args=(i,)).start() for i in range(PHILOSOPHERS)]
 
     input()
     exit(0)
+
 
 print('* DPP SOLUTIONS *')
 print('To stop execution, press Ctrl + C at any time\n')
