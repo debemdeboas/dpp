@@ -2,6 +2,8 @@
 
 from threading import Semaphore, Thread
 import time
+from typing import Callable
+
 
 def solution___at_least_one_leftie():
 
@@ -9,7 +11,7 @@ def solution___at_least_one_leftie():
 
     forks = [Semaphore(1) for _ in range(PHILOSOPHERS)]
 
-    def philosopher(i: int, leftie: bool):
+    def philosopher(i: int, leftie: bool, stop: Callable):
         print(f'starting philosopher {i} | leftie? {leftie}')
         time.sleep(1)
 
@@ -44,12 +46,22 @@ def solution___at_least_one_leftie():
             eat()
             put_forks(i)
 
+            if stop():
+                log('stopping')
+                break
+
+    stop_threads = False
+    workers = []
     for i in range(PHILOSOPHERS):
         if i == PHILOSOPHERS - 1:
             # at least one leftie to avoid a deadlock
-            Thread(daemon=True, target=philosopher, args=(i, True)).start()
+            thr = Thread(daemon=True, target=philosopher, args=(i, True, lambda: stop_threads))
         else:
-            Thread(daemon=True, target=philosopher, args=(i, False)).start()
+            thr = Thread(daemon=True, target=philosopher, args=(i, False, lambda: stop_threads))
+        workers.append(thr)
+        thr.start()
 
     input()
+    stop_threads = True
+    [thr.join() for thr in workers]
     exit(0)

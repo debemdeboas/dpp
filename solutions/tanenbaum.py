@@ -2,6 +2,8 @@
 
 from threading import Semaphore, Thread
 import time
+from typing import Callable
+
 
 def solution__tanenbaum():
 
@@ -11,7 +13,7 @@ def solution__tanenbaum():
     sem = [Semaphore(0) for _ in range(PHILOSOPHERS)]
     mutex = Semaphore(1)
 
-    def philosopher(i):
+    def philosopher(i: int, stop: Callable):
         print(f'starting philosopher {i}')
         time.sleep(1)
 
@@ -53,8 +55,18 @@ def solution__tanenbaum():
             eat()
             put_fork(i)
 
-    [Thread(daemon=True, target=philosopher, args=(i,)).start()
-     for i in range(PHILOSOPHERS)]
+            if stop():
+                log('stopping')
+                break
+
+    stop_threads = False
+    workers = []
+    for i in range(PHILOSOPHERS):
+        thr = Thread(daemon=True, target=philosopher, args=(i, lambda: stop_threads))
+        workers.append(thr)
+        thr.start()
 
     input()
+    stop_threads = True
+    [thr.join() for thr in workers]
     exit(0)
