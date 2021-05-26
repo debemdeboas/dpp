@@ -1,5 +1,5 @@
 # Dining Philosophers Problem
-This repository contains solutions for the [Dining Philosophers Problem (DPP)](https://en.wikipedia.org/wiki/Dining_philosophers_problem).
+[This repository](https://github.com/debemdeboas/dpp) contains solutions for the [Dining Philosophers Problem (DPP)](https://en.wikipedia.org/wiki/Dining_philosophers_problem).
 
 ## Solutions
 
